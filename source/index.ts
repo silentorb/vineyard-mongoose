@@ -7,8 +7,17 @@ export function clear_database(connection): Promise<any> {
       if (collections.length == 0)
         return resolve()
 
-      const promises = collections.map(collection => {
-        return collection.remove({})
+      const promises = collections
+        .filter(c=>c.s.name != 'system.indexes')
+        .map(collection => {
+        return new Promise((resolve, reject) => {
+          collection.remove({}, (error, result) => {
+            if (error)
+              reject(error)
+            else
+              resolve()
+          })
+        })
       })
 
       Promise.all(promises)
